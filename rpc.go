@@ -102,7 +102,7 @@ func monitor(client *rpc.Client, node string, stopChan chan struct{}) error {
 			select {
 			case <-stopChan:
 				return nil
-			case <-time.After(3 * time.Second):
+			case <-time.After(30 * time.Second):
 			}
 		}
 	}
