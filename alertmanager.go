@@ -8,8 +8,7 @@ import (
 	"time"
 )
 
-// const alertmanagerURL = "http://alertmanager-main.monitoring.svc:9093/api/v2/alerts"
-const alertmanagerURL = "http://localhost:9093/api/v2/alerts"
+const alertmanagerURL = "http://alertmanager-main.monitoring.svc:9093/api/v2/alerts"
 const alertThreshold = 15
 
 type Alert struct {
