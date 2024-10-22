@@ -46,7 +46,12 @@ func monitorNode(node string, wg *sync.WaitGroup, stopChan chan struct{}) {
 				log.Printf("Attempting to connect to node: %s", node)
 				client, err = rpc.Dial(node)
 				if err != nil {
-					log.Printf("Failed to connect to node %s: %v. Retrying in %v...", node, err, retryDelay)
+					message := fmt.Sprintf("Failed to connect to node %s: %v. Retrying in %v...", node, err, retryDelay)
+					log.Println(message)
+					err := sendAlert(node, message)
+					if err != nil {
+						log.Printf("Failed to send alert for node %s: %v", node, err)
+					}
 					time.Sleep(retryDelay)
 					continue
 				}
@@ -76,13 +81,7 @@ func monitor(client *rpc.Client, node string, stopChan chan struct{}) error {
 		default:
 			currentBlockNumber, err := getLatestBlockNumber(client, 3*time.Second)
 			if err != nil {
-				message := fmt.Sprintf("Error getting latest block from node %s: %v", node, err)
-				log.Println(message)
-
-				err := sendAlert(node, message)
-				if err != nil {
-					log.Printf("Failed to send alert for node %s: %v", node, err)
-				}
+				log.Printf("Error getting latest block from node %s: %v", node, err)
 				return err
 			}
 
