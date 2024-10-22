@@ -16,12 +16,12 @@ type Alert struct {
 	Annotations map[string]string `json:"annotations"`
 	GroupLabels map[string]string `json:"groupLabels"`
 	Status      string            `json:"status"`
-	StartsAt    *time.Time        `json:"startsAt"`
+	StartsAt    *time.Time        `json:"startsAt,omitempty"`
 	EndsAt      *time.Time        `json:"endsAt,omitempty"`
 }
 
 func sendAlert(node string, message string) error {
-	startTime := time.Now()
+	// startTime := time.Now()
 	alert := []Alert{
 		{
 			Labels: map[string]string{
@@ -37,8 +37,8 @@ func sendAlert(node string, message string) error {
 			GroupLabels: map[string]string{
 				"alert_group": "ethereum_block_monitor",
 			},
-			StartsAt: &startTime,
-			Status:   "firing",
+			// StartsAt: &startTime,
+			Status: "firing",
 		},
 	}
 
