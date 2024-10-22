@@ -25,7 +25,7 @@ func sendAlert(node string, message string) error {
 	alert := []Alert{
 		{
 			Labels: map[string]string{
-				"alertname": "EthereumBlockNotUpdated-test",
+				"alertname": "EthereumBlockNotUpdated",
 				"severity":  "critical",
 				"node":      node,
 				"instance":  node,
@@ -35,7 +35,7 @@ func sendAlert(node string, message string) error {
 				"description": message,
 			},
 			GroupLabels: map[string]string{
-				"alert_group": "ethereum_block_monitor-test",
+				"alert_group": "ethereum_block_monitor",
 			},
 			StartsAt: &startTime,
 			Status:   "firing",
