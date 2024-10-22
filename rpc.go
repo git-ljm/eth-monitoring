@@ -76,7 +76,13 @@ func monitor(client *rpc.Client, node string, stopChan chan struct{}) error {
 		default:
 			currentBlockNumber, err := getLatestBlockNumber(client, 3*time.Second)
 			if err != nil {
-				log.Printf("Error getting latest block from node %s: %v", node, err)
+				message := fmt.Sprintf("Error getting latest block from node %s: %v", node, err)
+				log.Println(message)
+
+				err := sendAlert(node, message)
+				if err != nil {
+					log.Printf("Failed to send alert for node %s: %v", node, err)
+				}
 				return err
 			}
 
