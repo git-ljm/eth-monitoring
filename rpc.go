@@ -60,9 +60,13 @@ func monitorNode(node string, wg *sync.WaitGroup, stopChan chan struct{}) {
 
 			err = monitor(client, node, stopChan)
 			if err != nil {
-				log.Printf("Error monitoring node %s: %v. Closing connection and retrying...", node, err)
+				message := fmt.Sprintf("Error monitoring node %s: %v. Closing connection and retrying...", node, err)
 				client.Close()
 				client = nil
+				err := sendAlert(node, message)
+				if err != nil {
+					log.Printf("Failed to send alert for node %s: %v", node, err)
+				}
 				time.Sleep(retryDelay)
 			}
 		}

@@ -8,31 +8,38 @@ import (
 	"time"
 )
 
-const alertmanagerURL = "http://alertmanager-main.monitoring.svc:9093/api/v2/alerts"
+// const alertmanagerURL = "http://alertmanager-main.monitoring.svc:9093/api/v2/alerts"
+const alertmanagerURL = "http://localhost:9093/api/v2/alerts"
 const alertThreshold = 15
 
 type Alert struct {
 	Labels      map[string]string `json:"labels"`
 	Annotations map[string]string `json:"annotations"`
-	StartsAt    time.Time         `json:"startsAt"`
 	GroupLabels map[string]string `json:"groupLabels"`
+	Status      string            `json:"status"`
+	StartsAt    *time.Time        `json:"startsAt"`
+	EndsAt      *time.Time        `json:"endsAt,omitempty"`
 }
 
 func sendAlert(node string, message string) error {
+	startTime := time.Now()
 	alert := []Alert{
 		{
 			Labels: map[string]string{
-				"alertname": "EthereumBlockNotUpdated",
+				"alertname": "EthereumBlockNotUpdated-test",
 				"severity":  "critical",
 				"node":      node,
+				"instance":  node,
 			},
 			Annotations: map[string]string{
 				"summary":     message,
 				"description": message,
 			},
 			GroupLabels: map[string]string{
-				"alert_group": "ethereum_block_monitor",
+				"alert_group": "ethereum_block_monitor-test",
 			},
+			StartsAt: &startTime,
+			Status:   "firing",
 		},
 	}
 
