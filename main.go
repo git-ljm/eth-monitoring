@@ -18,6 +18,7 @@ func main() {
 		"http://scroll-geth.chainrpc.svc:8545",
 		"http://zklink-nova-node.chainrpc.svc:3060",
 		"http://merlin-rpc.chainrpc.svc:8545",
+		"http://duck.chainrpc.svc:8545",
 		// add more
 	}
 
