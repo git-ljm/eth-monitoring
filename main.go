@@ -15,10 +15,16 @@ func main() {
 		"http://linea.chainrpc.svc:8545",
 		"http://manta-geth.chainrpc.svc:8545",
 		"http://mantle-geth.chainrpc.svc:8545",
-		"http://scroll-geth.chainrpc.svc:8545",
+		// "http://scroll-geth.chainrpc.svc:8545",
 		"http://zklink-nova-node.chainrpc.svc:3060",
 		"http://merlin-rpc.chainrpc.svc:8545",
 		"http://duck.chainrpc.svc:8545",
+		"http://bitlayer-geth-test.chainrpc.svc:8545",
+		"http://btwo-geth.chainrpc.svc:8545",
+		"http://juchain.chainrpc.svc:8545",
+		"http://goat-geth.chainrpc.svc:8545",
+		"http://tac-testnet.chainrpc.svc:8545",
+
 		// add more
 	}
 
