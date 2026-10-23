@@ -24,12 +24,11 @@ const (
 // taiko-node 是 taiko 的 driver，没有 eth RPC，它异常时 taiko-geth 高度会停止增长，由 taiko-geth 覆盖。
 var nodes = []Node{
 	{Name: "duck", Kind: KindEVM, URL: "http://duck.chainrpc.svc:8545"},
-	{Name: "eth2beacon", Kind: KindBeacon, URL: "http://eth2beacon.chainrpc.svc:5052"},
 	{Name: "gethnode", Kind: KindEVM, URL: "http://gethnode.chainrpc.svc:8545"},
 	{Name: "goat-geth", Kind: KindEVM, URL: "http://goat-geth.chainrpc.svc:8545"},
 	{Name: "iotex", Kind: KindEVM, URL: "http://iotex.chainrpc.svc:15014"},
 	{Name: "manta-reth", Kind: KindEVM, URL: "http://manta-reth.chainrpc.svc:8545"},
-	{Name: "merlin", Kind: KindEVM, URL: "http://merlin-rpc.chainrpc.svc:8545"},
+	{Name: "merlin", Kind: KindEVM, URL: "http://merlin-v2.chainrpc.svc:8123"},
 	{Name: "rsk", Kind: KindEVM, URL: "http://rsk.chainrpc.svc:4444"},
 	{Name: "tac", Kind: KindEVM, URL: "http://tac.chainrpc.svc:8545"},
 	{Name: "taiko-geth", Kind: KindEVM, URL: "http://taiko-geth.chainrpc.svc:8545"},
