@@ -1,11 +1,13 @@
-FROM golang:1.22.2-alpine as BUILDER
-ENV GOFLAGS="-buildvcs=false"
-RUN apk add --no-cache ca-certificates make gcc musl-dev linux-headers git
+FROM golang:1.26-alpine AS builder
+ENV CGO_ENABLED=0 GOFLAGS="-buildvcs=false"
 WORKDIR /workdir
-COPY . .
-RUN go build -o eth-monitoring
+COPY go.mod ./
+RUN go mod download
+COPY *.go ./
+RUN go build -trimpath -ldflags="-s -w" -o eth-monitoring
 
-FROM alpine:3.17
+FROM alpine:3.22
 WORKDIR /app
-COPY --from=BUILDER /workdir/eth-monitoring ./
-ENTRYPOINT [ "/app/eth-monitoring" ]
+COPY --from=builder /workdir/eth-monitoring ./
+USER 65534:65534
+ENTRYPOINT ["/app/eth-monitoring"]

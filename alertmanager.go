@@ -2,60 +2,73 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
-const alertmanagerURL = "http://alertmanager-main.monitoring.svc:9093/api/v2/alerts"
-const alertThreshold = 15
+const (
+	alertNameStalled  = "EthereumBlockNotUpdated"
+	alertNameRPCError = "EthereumNodeRPCError"
 
-type Alert struct {
+	// 告警发送时 endsAt 设为 now+alertTTL，持续告警期间每次轮询都会续期；
+	// 本程序挂掉时告警会在 TTL 后自动恢复，不会永久挂着。
+	alertTTL = 5 * time.Minute
+)
+
+// postableAlert 对应 Alertmanager v2 API 的 PostableAlert。
+type postableAlert struct {
 	Labels      map[string]string `json:"labels"`
-	Annotations map[string]string `json:"annotations"`
-	GroupLabels map[string]string `json:"groupLabels"`
-	Status      string            `json:"status"`
-	StartsAt    *time.Time        `json:"startsAt,omitempty"`
-	EndsAt      *time.Time        `json:"endsAt,omitempty"`
+	Annotations map[string]string `json:"annotations,omitempty"`
+	StartsAt    time.Time         `json:"startsAt"`
+	EndsAt      time.Time         `json:"endsAt"`
 }
 
-func sendAlert(node string, message string) error {
-	// startTime := time.Now()
-	alert := []Alert{
-		{
-			Labels: map[string]string{
-				"alertname": "EthereumBlockNotUpdated",
-				"severity":  "critical",
-				"node":      node,
-				"instance":  node,
-			},
-			Annotations: map[string]string{
-				"summary":     message,
-				"description": message,
-			},
-			GroupLabels: map[string]string{
-				"alert_group": "ethereum_block_monitor",
-			},
-			// StartsAt: &startTime,
-			Status: "firing",
-		},
-	}
+type Alerter struct {
+	url    string
+	client *http.Client
+}
 
-	data, err := json.Marshal(alert)
+func NewAlerter(url string) *Alerter {
+	return &Alerter{url: url, client: &http.Client{Timeout: 10 * time.Second}}
+}
+
+func (a *Alerter) Send(ctx context.Context, alerts ...postableAlert) error {
+	data, err := json.Marshal(alerts)
 	if err != nil {
 		return err
 	}
 
-	resp, err := http.Post(alertmanagerURL, "application/json", bytes.NewBuffer(data))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, a.url, bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := a.client.Do(req)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to send alert, status: %d", resp.StatusCode)
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, 256))
+		return fmt.Errorf("alertmanager status %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
 	}
-
 	return nil
+}
+
+func alertLabels(n Node, alertName string) map[string]string {
+	return map[string]string{
+		"alertname":   alertName,
+		"severity":    "critical",
+		"chain":       n.Name,
+		"node":        n.URL,
+		"instance":    n.URL,
+		"alert_group": "ethereum_block_monitor",
+	}
 }
